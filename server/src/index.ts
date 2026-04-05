@@ -2,15 +2,10 @@ import Fastify from "fastify";
 import { ApolloServer } from "@apollo/server";
 import fastifyApollo, { fastifyApolloDrainPlugin } from "@as-integrations/fastify";
 
-const typeDefs = `
-  type Query {
-    hello: String
-  }
-`
+import { typeDefs } from "./schema";
 
 const resolvers = {
   Query: {
-    hello: () => "Hello from TaskFlow"
   }
 }
 
