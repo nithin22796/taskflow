@@ -17,4 +17,20 @@ export const userTypeDefs = `#graphql
     me: User
     user(input: UserInput!): User
   }
+
+  input UpdateUserInput {
+    id: ID!
+    name: String
+    email: String
+    password: String
+  }
+
+  input DeleteUserInput {
+    id: ID!
+  }
+
+  type Mutation {
+    updateUser(input: UpdateUserInput!): User!
+    deleteUser(input: DeleteUserInput!): User
+  }
 `

@@ -1,7 +1,9 @@
 import 'dotenv/config'
-import Fastify, {FastifyRequest} from "fastify";
+import Fastify, {FastifyReply, FastifyRequest} from "fastify";
+import fastifyCookie from '@fastify/cookie'
 import { ApolloServer } from "@apollo/server";
 import fastifyApollo, { fastifyApolloDrainPlugin } from "@as-integrations/fastify";
+import jwt from "jsonwebtoken";
 
 import { typeDefs } from "./schema";
 import prisma from "./db";
@@ -17,10 +19,26 @@ const apollo = new ApolloServer<Context>({
 });
 
 await apollo.start();
+await fastify.register(fastifyCookie);
 await fastify.register(fastifyApollo(apollo), {
-  context: async (request: FastifyRequest): Promise<Context> => {
+  context: async (request: FastifyRequest, reply: FastifyReply): Promise<Context> => {
+    let userId = null;
+
+    const token = request.cookies.accessToken;
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {id: string}
+        userId = decoded.id;
+      } catch {
+        console.warn("Token invalid or expired");
+      }
+    }
+
     return {
-      db: prisma
+      db: prisma,
+      reply,
+      request,
+      userId
     }
   }
 });
