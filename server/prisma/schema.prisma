@@ -45,6 +45,8 @@ model User {
   resolvedTasks      Task[]          @relation("ResolvedBy")
   verifiedTasks      Task[]          @relation("VerifiedBy")
   comments           Comment[]
+  ownedProjects      Project[]
+
 }
 
 model Project {
@@ -54,10 +56,14 @@ model Project {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  ownerId     String
 
   // Relations
   members ProjectMember[]
   tasks   Task[]
+  owner   User    @relation(fields: [ownerId], references: [id])
+
+  @@unique([name, ownerId])
 }
 
 model ProjectMember {
