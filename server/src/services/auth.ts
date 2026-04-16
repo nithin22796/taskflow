@@ -1,9 +1,8 @@
 import { z } from "zod";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import { Context } from "../context";
 import { Prisma } from "../generated/prisma/client";
 import ValidationError from "../utils/errors";
+import { ServiceProps } from "../types/services";
 
 const registerSchema = z.object({
   email: z.email("Invalid Email"),
@@ -22,7 +21,7 @@ const loginSchema = z.object({
   password: z.string("Password cannot be empty").trim()
 })
 
-export const register = async ({ input, context }: {input: unknown; context: Context}) => {
+export const register = async ({ input, context }: ServiceProps) => {
   try {
     const data = registerSchema.safeParse(input);
     if (data.success) {
@@ -47,7 +46,7 @@ export const register = async ({ input, context }: {input: unknown; context: Con
   }
 };
 
-export const login = async ({ input, context}: {input: unknown; context: Context}) => {
+export const login = async ({ input, context}: ServiceProps) => {
   const data = loginSchema.safeParse(input);
   if (data.error) {
     console.error("Validation error - ", data.error);

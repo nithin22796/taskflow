@@ -1,8 +1,8 @@
 import z from "zod";
-import { Context } from "../context";
 import ValidationError from "../utils/errors";
 import { ProjectRole } from "../generated/prisma/enums";
 import { Prisma } from "../generated/prisma/client";
+import { ServiceProps } from "../types/services";
 
 const createProjectSchema = z.object({
   name: z.string("Project name cannot be empty")
@@ -34,12 +34,7 @@ const getProjectSchema = z.object({
   id: z.string().trim()
 });
 
-interface Props {
-  context: Context;
-  input: unknown;
-}
-
-export const createProject = async ({context, input}: Props) => {
+export const createProject = async ({context, input}: ServiceProps) => {
   const data = createProjectSchema.safeParse(input);
 
   if (data.error) {
@@ -49,7 +44,7 @@ export const createProject = async ({context, input}: Props) => {
   console.log("Creating project....");
   const project = await context.db.$transaction(async (tx) => {
     const prj = await tx.project.create({ data: {...data.data, ownerId: context.userId!} });
-    const relation = await tx.projectMember.create({ data: {
+    await tx.projectMember.create({ data: {
       projectId: prj.id,
       userId: context.userId!,
       userRole: ProjectRole.OWNER
@@ -60,7 +55,7 @@ export const createProject = async ({context, input}: Props) => {
   return project;
 }
 
-export const updateProject = async ({context, input}: Props) => {
+export const updateProject = async ({context, input}: ServiceProps) => {
   const data = updateProjectSchema.safeParse(input);
 
   if (data.error) {
@@ -84,7 +79,7 @@ export const updateProject = async ({context, input}: Props) => {
   }
 }
 
-export const deleteProject = async ({context, input}: Props) => {
+export const deleteProject = async ({context, input}: ServiceProps) => {
   const data = deleteProjectSchema.safeParse(input);
 
   if (data.error) {
@@ -115,7 +110,7 @@ export const deleteProject = async ({context, input}: Props) => {
   }
 }
 
-export const getProjects = async ({context, input}: Props) => {
+export const getProjects = async ({context, input}: ServiceProps) => {
 
   const data = getProjectsInputSchema.safeParse(input);
 
@@ -147,7 +142,7 @@ export const getProjects = async ({context, input}: Props) => {
   return projects;
 }
 
-export const getProject = async ({context, input}: Props) => {
+export const getProject = async ({context, input}: ServiceProps) => {
 
   const data = getProjectSchema.safeParse(input);
 

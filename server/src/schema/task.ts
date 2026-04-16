@@ -15,17 +15,43 @@ export const taskTypeDefs = `#graphql
     comments: [Comment!]!
   }
 
-  input TaskInput {
-    id: ID
+  input TasksInput {
     title: String
     status: TaskStatus
     priority: TaskPriority
-    reportedBy: ID
+  }
+
+  input TaskInput {
+    id: ID!
+  }
+
+  input CreateTask {
+    title: String!
+    description: String
+    projectId: ID!
+  }
+
+  input UpdateTask {
+    id: ID!
+    title: String
+    description: String
+    status: TaskStatus
+    priority: TaskPriority
     assignedTo: ID
-    project: ID
+  }
+
+  input DeleteTask {
+    id: ID!
   }
 
   type Query {
-    tasks(input: TaskInput): [Task!]!
+    tasks(input: TasksInput): [Task!]!
+    task(input: TaskInput!): Task
+  }
+
+  type Mutation {
+    createTask(input: CreateTask!): Task!
+    updateTask(input: UpdateTask!): Task!
+    deleteTask(input: DeleteTask!): ID!
   }
 `
