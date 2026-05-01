@@ -8,12 +8,23 @@ export const commentTypeDefs = `#graphql
     updatedAt: String!
   }
 
-  input CommentInput {
-    taskId: ID
-    authorId: ID
+  input CreateComment {
+    body: String!
+    taskId: ID!
   }
 
-  type Query {
-    comments(input: CommentInput): [Comment!]!
+  input UpdateComment {
+    id: ID!
+    body: String
+  }
+
+  input DeleteComment {
+    id: ID!
+  }
+
+  type Mutation {
+    createComment(input: CreateComment!): Comment!
+    updateComment(input: UpdateComment!): Comment!
+    deleteComment(input: DeleteComment!): ID!
   }
 `
